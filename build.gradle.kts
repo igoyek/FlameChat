@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "dev.igoyek"
-version = "1.0.3"
+version = "1.0.4"
 description = "Chat manager for FlameCode studio."
 
 java {
@@ -59,4 +59,9 @@ dependencies {
 
     // bstats
     implementation("org.bstats:bstats-bukkit:3.0.2")
+
+    // licenses
+    implementation("org.projectlombok:lombok:1.18.22")
+    implementation("org.apache.httpcomponents:httpclient:4.3.2")
+    implementation("org.json:json:20210307")
 }

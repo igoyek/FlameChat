@@ -6,6 +6,10 @@ import dev.igoyek.flamechat.command.ChatCommandTabCompleter;
 import dev.igoyek.flamechat.listener.ChatListener;
 import dev.igoyek.flamechat.listener.PlayerConnectListener;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,13 +31,12 @@ public class ChatPlugin extends JavaPlugin {
         this.getLogger().log(Level.INFO, "Loading configuration...");
         this.saveDefaultConfig();
         this.reloadConfig();
-
-        this.chatCooldowns = new HashMap<UUID, Long>();
     }
 
     @Override
     public void onEnable() {
         this.plugin = this;
+        this.chatCooldowns = new HashMap<UUID, Long>();
         this.getLogger().log(Level.INFO, "Registering command...");
         this.getCommand("chat").setExecutor(new ChatCommand(this));
         this.getCommand("chat").setTabCompleter(new ChatCommandTabCompleter());

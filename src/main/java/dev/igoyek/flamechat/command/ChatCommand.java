@@ -92,6 +92,7 @@ public class ChatCommand implements CommandExecutor {
             if (args.length < 2) {
                 player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.invalid-usage"))
                         .replace("{usage}", "/chat slow <time>"));
+                player.sendTitle("", "", 1, 5, 1);
                 return true;
             }
 

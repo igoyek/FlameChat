@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public final class StringUtil {
 
-    private static final Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+    private static final Pattern pattern = Pattern.compile("&(#[a-fA-F0-9]{6})");
 
     public static String color(String message)
     {

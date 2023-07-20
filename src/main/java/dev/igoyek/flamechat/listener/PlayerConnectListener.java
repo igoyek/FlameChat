@@ -2,6 +2,7 @@ package dev.igoyek.flamechat.listener;
 
 import dev.igoyek.flamechat.ChatPlugin;
 import dev.igoyek.flamechat.util.StringUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +28,7 @@ public class PlayerConnectListener implements Listener {
 
         if (!player.hasPlayedBefore()) {
             if (this.plugin.getConfig().getString("connect-messages.first-join") != null) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("connect-messages.first-join")
+                Bukkit.broadcastMessage(StringUtil.color(this.plugin.getConfig().getString("connect-messages.first-join")
                         .replace("{player}", player.getName())));
             }
         }

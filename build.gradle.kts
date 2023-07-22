@@ -20,7 +20,7 @@ bukkit {
     version = project.version as String
     apiVersion = "1.13"
     description = project.description
-    authors = listOf("igoyek", "FlameCode")
+    author = "igoyek"
     website = "https://flamecode.pl"
     commands {
         create("chat") {
@@ -41,7 +41,7 @@ tasks {
         relocate("org.bstats", "dev.igoyek.flamechat.metrics")
     }
     withType<JavaCompile> {
-        options.encoding = "utf-8"
+        options.encoding = "UTF-8"
     }
 }
 
@@ -59,9 +59,4 @@ dependencies {
 
     // bstats
     implementation("org.bstats:bstats-bukkit:3.0.2")
-
-    // licenses
-    implementation("org.projectlombok:lombok:1.18.22")
-    implementation("org.apache.httpcomponents:httpclient:4.3.2")
-    implementation("org.json:json:20210307")
 }

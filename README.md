@@ -30,3 +30,5 @@
 + flamechat.bypass.slow - bypass chat slowdown
 + flamechat.bypass.censor - bypass censorship in chat
 + flamechat.adminchat - admin chat access
+
+**Support - Discord server:** [FlameCode.pl - Twój pomysł Nasze wykonanie](https://discord.com/invite/EhVVXuBVTQ)

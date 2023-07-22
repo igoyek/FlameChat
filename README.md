@@ -1,12 +1,12 @@
 ### FlameChat 🔥 - Chat management plugin written for FlameCode studio.
 
-+ Plugin update: `1.0.3` 
++ Plugin update: `1.0.4` 
 + Supported versions: `1.16.5 - 1.19.4`
 + Required Java version: `11+`
 
 **Commands:**
 + /chat - displays list of available commands
-+ /chat enable - odblokowuje możliwość pisania na czacie
++ /chat enable - unlocks the ability to write in the chat
 + /chat disable - blocks the ability to write in the chat
 + /chat slow [time] - sets time slowdown
 + /chat reload - reloads plugin configuration
@@ -17,7 +17,7 @@
 + Censorship of individual phrases/words
 + Welcome and farewell messages
 + New user message (first connection)
-+ Color RGB messages in HEX format, e.g. `#FF0000`
++ Color RGB messages in HEX format, e.g. `&#FF0000`
   
 **Permissions:**
 + flamechat.command.chat - master permission for the /chat command

@@ -17,7 +17,7 @@
 + Censorship of individual phrases/words
 + Welcome and farewell messages
 + New user message (first connection)
-+ Color RGB messages in HEX format, e.g. `#FF0000`
++ Color RGB messages in HEX format, e.g. `&#FF0000`
   
 **Permissions:**
 + flamechat.command.chat - master permission for the /chat command

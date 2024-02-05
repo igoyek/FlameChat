@@ -55,7 +55,7 @@ repositories {
 
 dependencies {
     // spigot api
-    compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
 
     // bstats
     implementation("org.bstats:bstats-bukkit:3.0.2")

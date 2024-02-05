@@ -20,7 +20,7 @@ bukkit {
     version = project.version as String
     apiVersion = "1.13"
     description = project.description
-    authors = listOf("igoyek", "FlameCode.pl")
+    author = "igoyek"
     website = "https://flamecode.pl"
     commands {
         create("chat") {

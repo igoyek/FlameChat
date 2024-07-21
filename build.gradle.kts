@@ -5,13 +5,12 @@ plugins {
 }
 
 group = "dev.igoyek"
-version = "1.0.4"
+version = "1.0.5"
 description = "Chat manager for FlameCode studio."
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 bukkit {
@@ -55,7 +54,7 @@ repositories {
 
 dependencies {
     // spigot api
-    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
 
     // bstats
     implementation("org.bstats:bstats-bukkit:3.0.2")

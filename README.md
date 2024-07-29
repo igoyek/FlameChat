@@ -1,13 +1,14 @@
 ### FlameChat 🔥 - Chat management plugin written for FlameCode studio.
 
-+ Plugin update: `1.0.4` 
-+ Supported versions: `1.16.5 - 1.19.4`
-+ Required Java version: `11+`
++ Plugin update: `2.0.0` 
++ Supported versions: `1.19.4 - 1.21`
++ Required Java version: `17+`
 
 **Commands:**
 + /chat - displays list of available commands
 + /chat enable - unlocks the ability to write in the chat
 + /chat disable - blocks the ability to write in the chat
++ /chat premium - allows to write in the chat only for premium users
 + /chat slow [time] - sets time slowdown
 + /chat reload - reloads plugin configuration
 + /adminchat <message> - message to staff members
@@ -15,9 +16,7 @@
 **Additional functions:**
 + Staff members chat (*/adminchat*)
 + Censorship of individual phrases/words
-+ Welcome and farewell messages
-+ New user message (first connection)
-+ Color RGB messages in HEX format, e.g. `&#FF0000`
++ MiniMessage support! (https://docs.adventure.kyori.net/minimessage.html)
   
 **Permissions:**
 + flamechat.command.chat - master permission for the /chat command
@@ -29,6 +28,7 @@
 + flamechat.bypass.locked - the ability to write in a blocked chat
 + flamechat.bypass.slow - bypass chat slowdown
 + flamechat.bypass.censor - bypass censorship in chat
++ flamechat.bypass.premium - bypass for typing when chat is only for premium users
 + flamechat.adminchat - admin chat access
 
 **Support - Discord server:** [FlameCode.pl - Twój pomysł Nasze wykonanie](https://discord.com/invite/EhVVXuBVTQ)

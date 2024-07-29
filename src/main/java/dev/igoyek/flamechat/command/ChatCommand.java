@@ -1,134 +1,120 @@
 package dev.igoyek.flamechat.command;
 
-import dev.igoyek.flamechat.ChatPlugin;
-import dev.igoyek.flamechat.util.StringUtil;
-import org.bukkit.Bukkit;
+import dev.igoyek.flamechat.chat.ChatService;
+import dev.igoyek.flamechat.chat.ChatStatus;
+import dev.igoyek.flamechat.configuration.ConfigurationService;
+import dev.igoyek.flamechat.configuration.implementation.MessageConfiguration;
+import dev.igoyek.flamechat.configuration.implementation.PluginConfiguration;
+import dev.igoyek.flamechat.notification.NotificationService;
+import dev.igoyek.flamechat.notification.implementation.ChatNotification;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import panda.utilities.text.Formatter;
 
 public class ChatCommand implements CommandExecutor {
 
-    private final ChatPlugin plugin;
+    private final NotificationService notificationService;
+    private final ConfigurationService configService;
+    private final PluginConfiguration pluginConfig;
+    private final MessageConfiguration messageConfig;
+    private final ChatService chatService;
 
-    public ChatCommand(ChatPlugin plugin) {
-        this.plugin = plugin;
+    public ChatCommand(NotificationService notificationService, ConfigurationService configService, PluginConfiguration pluginConfig, MessageConfiguration messageConfig, ChatService chatService) {
+        this.notificationService = notificationService;
+        this.configService = configService;
+        this.pluginConfig = pluginConfig;
+        this.messageConfig = messageConfig;
+        this.chatService = chatService;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.is-console")));
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (!(sender instanceof Player player)) {
+            this.notificationService.send(sender, new ChatNotification(this.messageConfig.onlyForPlayers));
             return true;
         }
 
-        Player player = (Player) sender;
+        if (args.length == 0) {
+            Formatter formatter = new Formatter().register("{USAGE}", "/chat <enable|disable|premium|clear|slow> [delay]");
 
-        if (!player.hasPermission("flamechat.command.chat")) {
-            player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.missing-permission"))
-                    .replace("{permission}", "flamechat.command.chat"));
+            this.notificationService.send(player, new ChatNotification(formatter.format(this.messageConfig.invalidUsage)));
             return true;
         }
 
-        if (args.length < 1) {
-            player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.invalid-usage"))
-                    .replace("{usage}", "/chat <enable/disable/slow/reload> [time]"));
-            return true;
+        switch (args[0].toLowerCase()) {
+            case "enable" -> {
+                if (this.chatService.getChatStatus() == ChatStatus.ENABLED) {
+                    this.notificationService.send(player, new ChatNotification(this.messageConfig.chatStatusCannotBeTheSame));
+                    return true;
+                }
+
+                Formatter formatter = new Formatter().register("{STATUS}", this.messageConfig.enabledStatus);
+
+                this.chatService.changeStatus(ChatStatus.ENABLED);
+                this.notificationService.broadcast(new ChatNotification(formatter.format(this.messageConfig.chatStatusChanged)));
+            }
+            case "disable" -> {
+                if (this.chatService.getChatStatus() == ChatStatus.DISABLED) {
+                    this.notificationService.send(player, new ChatNotification(this.messageConfig.chatStatusCannotBeTheSame));
+                    return true;
+                }
+
+                Formatter formatter = new Formatter().register("{STATUS}", this.messageConfig.disabledStatus);
+
+                this.chatService.changeStatus(ChatStatus.DISABLED);
+                this.notificationService.broadcast(new ChatNotification(formatter.format(this.messageConfig.chatStatusChanged)));
+            }
+            case "premium" -> {
+                if (this.chatService.getChatStatus() == ChatStatus.PREMIUM) {
+                    this.notificationService.send(player, new ChatNotification(this.messageConfig.chatStatusCannotBeTheSame));
+                    return true;
+                }
+
+                Formatter formatter = new Formatter().register("{STATUS}", this.messageConfig.premiumStatus);
+
+                this.chatService.changeStatus(ChatStatus.PREMIUM);
+                this.notificationService.broadcast(new ChatNotification(formatter.format(this.messageConfig.chatStatusChanged)));
+            }
+            case "clear" -> {
+                for (int i = 0; i < 100; i++) {
+                    this.notificationService.broadcast(new ChatNotification(" "));
+                }
+
+                this.notificationService.broadcast(new ChatNotification(this.messageConfig.chatCleared));
+            }
+            case "slow" -> {
+                if (args.length != 2) {
+                    Formatter formatter = new Formatter().register("{USAGE}", "/chat slow <delay>");
+
+                    this.notificationService.send(player, new ChatNotification(formatter.format(this.messageConfig.invalidUsage)));
+
+                    return true;
+                }
+
+                try {
+                    double delay = Double.parseDouble(args[1]);
+                    this.chatService.setDelay(delay);
+
+                    Formatter formatter = new Formatter().register("{DELAY}", String.valueOf(delay));
+
+                    this.notificationService.broadcast(new ChatNotification(formatter.format(this.messageConfig.chatSlowed)));
+                } catch (NumberFormatException exception) {
+                    this.notificationService.send(player, new ChatNotification(this.messageConfig.argumentMustBeNumber));
+                }
+            }
+            case "reload" -> {
+                this.configService.reloadAllConfigs();
+                this.notificationService.send(player, new ChatNotification(this.messageConfig.configReloaded));
+            }
+            default -> {
+                Formatter formatter = new Formatter().register("{USAGE}", "/chat <enable|disable|premium|clear|slow> [delay]");
+
+                this.notificationService.send(player, new ChatNotification(formatter.format(this.messageConfig.invalidUsage)));
+            }
         }
-
-        if (args[0].equalsIgnoreCase("enable") || args[0].equalsIgnoreCase("on")) {
-            if (!player.hasPermission("flamechat.command.chat.enable")) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.missing-permission"))
-                        .replace("{permission}", "flamechat.command.chat.enable"));
-                return true;
-            }
-
-            if (this.plugin.getConfig().getBoolean("settings.chat-status")) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.chat-already-enabled")));
-                return true;
-            }
-
-            this.plugin.getConfig().set("settings.chat-status", true);
-            this.plugin.saveConfig();
-
-            for (Player online : Bukkit.getOnlinePlayers()) online.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.chat-enabled")));
-        } else if (args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase("off")) {
-            if (!player.hasPermission("flamechat.command.chat.disable")) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.missing-permission"))
-                        .replace("{permission}", "flamechat.command.chat.disable"));
-                return true;
-            }
-
-            if (!this.plugin.getConfig().getBoolean("settings.chat-status")) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.chat-already-disabled")));
-                return true;
-            }
-
-            this.plugin.getConfig().set("settings.chat-status", false);
-            this.plugin.saveConfig();
-
-            for (Player online : Bukkit.getOnlinePlayers())
-                online.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.chat-disabled")));
-
-        } else if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("c")) {
-            if (!player.hasPermission("flamechat.command.chat.clear")) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.missing-permission"))
-                        .replace("{permission}", "flamechat.command.chat.clear"));
-                return true;
-            }
-            for (int i = 0; i < 100; i++) {
-                for (Player online : Bukkit.getOnlinePlayers()) online.sendMessage("");
-            }
-            Bukkit.broadcastMessage(StringUtil.color(this.plugin.getConfig().getString("messages.chat-cleared")));
-        } else if (args[0].equalsIgnoreCase("slow")) {
-            if (!player.hasPermission("flamechat.command.chat.slow")) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.missing-permission"))
-                        .replace("{permission}", "flamechat.command.chat.slow"));
-                return true;
-            }
-
-            if (args.length < 2) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.invalid-usage"))
-                        .replace("{usage}", "/chat slow <time>"));
-                player.sendTitle("", "", 1, 5, 1);
-                return true;
-            }
-
-            int time;
-            try {
-                time = Integer.parseInt(args[1]);
-            } catch (NumberFormatException exception) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.invalid-time")));
-                return true;
-            }
-
-            if (time < 0) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.invalid-time")));
-                return true;
-            }
-
-            this.plugin.getConfig().set("settings.slowdown", time);
-            this.plugin.saveConfig();
-
-            for (Player online : Bukkit.getOnlinePlayers())
-                online.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.chat-slowed"))
-                        .replace("{time}", String.valueOf(time)));
-        } else if (args[0].equalsIgnoreCase("reload")) {
-            if (!player.hasPermission("flamechat.reload")) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.missing-permission"))
-                        .replace("{permission}", "flamechat.reload"));
-                return true;
-            }
-
-            this.plugin.reloadConfig();
-            player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.reload-success")));
-        } else {
-            player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.invalid-usage"))
-                    .replace("{usage}", "/chat <enable/disable/slow/reload> [time]"));
-        }
-
         return false;
     }
 }

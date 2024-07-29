@@ -1,7 +1,10 @@
 package dev.igoyek.flamechat.command;
 
-import dev.igoyek.flamechat.ChatPlugin;
-import dev.igoyek.flamechat.util.StringUtil;
+import dev.igoyek.flamechat.configuration.implementation.MessageConfiguration;
+import dev.igoyek.flamechat.configuration.implementation.PluginConfiguration;
+import dev.igoyek.flamechat.notification.NotificationService;
+import dev.igoyek.flamechat.notification.implementation.ActionBarNotification;
+import dev.igoyek.flamechat.notification.implementation.ChatNotification;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,31 +13,33 @@ import org.bukkit.entity.Player;
 
 public class AdminChatCommand implements CommandExecutor {
 
-    private final ChatPlugin plugin;
+    private final NotificationService notificationService;
+    private final PluginConfiguration pluginConfig;
+    private final MessageConfiguration messageConfig;
 
-    public AdminChatCommand(ChatPlugin plugin) {
-        this.plugin = plugin;
+    public AdminChatCommand(NotificationService notificationService, PluginConfiguration pluginConfig, MessageConfiguration messageConfig) {
+        this.notificationService = notificationService;
+        this.pluginConfig = pluginConfig;
+        this.messageConfig = messageConfig;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.is-console")));
+        if (!(sender instanceof Player player)) {
+            this.notificationService.send(sender, new ChatNotification(this.messageConfig.onlyForPlayers));
             return true;
         }
 
-        Player player = (Player) sender;
-
         if (!player.hasPermission("flamechat.adminchat")) {
-            player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.missing-permission"))
-                    .replace("{permission}", "flamechat.adminchat"));
+            this.notificationService.send(player, new ChatNotification(this.messageConfig.requiredPermission
+                    .replace("{PERMISSION}", "flamechat.adminchat")));
             return true;
         }
 
         if (args.length < 1) {
-            player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("messages.invalid-usage"))
-                    .replace("{usage}", "/adminchat <message>"));
+            this.notificationService.send(player, new ChatNotification(this.messageConfig.invalidUsage
+                    .replace("{USAGE}", "/adminchat <message>")));
             return true;
         }
 
@@ -45,9 +50,12 @@ public class AdminChatCommand implements CommandExecutor {
 
         for (Player staff : Bukkit.getOnlinePlayers()) {
             if (staff.hasPermission("flamechat.adminchat")) {
-                player.sendMessage(StringUtil.color(this.plugin.getConfig().getString("adminchat.format")
-                        .replace("{player}", player.getName())
-                        .replace("{message}", message.toString())));
+                String formatted = this.pluginConfig.adminChat.format
+                        .replace("{PLAYER}", player.getName())
+                        .replace("{MESSAGE}", message.toString().trim());
+
+                this.notificationService.send(staff, new ChatNotification(formatted));
+                this.notificationService.send(staff, new ActionBarNotification(formatted));
             }
         }
         return true;

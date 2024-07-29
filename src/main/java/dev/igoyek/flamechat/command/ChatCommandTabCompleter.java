@@ -19,6 +19,7 @@ public class ChatCommandTabCompleter implements TabCompleter {
             String argument = args[0].toLowerCase();
             if ("enable".startsWith(argument)) completions.add("enable");
             if ("disable".startsWith(argument)) completions.add("disable");
+            if ("premium".startsWith(argument)) completions.add("premium");
             if ("slow".startsWith(argument)) completions.add("slow");
             if ("clear".startsWith(argument)) completions.add("clear");
             if ("reload".startsWith(argument)) completions.add("reload");
